@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>QR Code Styling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #header {
+            width: 100%;
+            height: 10%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.09);
+        }
+
+        #content {
+            width: 80%;
+            margin-top: 4%;
+            display: flex;
+            justify-content: space-evenly;
+        }
+
+        .inputContainer {
+            margin-top: 5%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #formButton {
+            margin-top: 5%;
+            background-color: rgb(250, 250, 250);
+            border: 0.5px solid grey;
+            border-radius: 8px;
+            box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.09);
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="header">
+        <h1>My QR Generator</h1>
+    </header>
+    <section id="content">
+        <div id="canvas">
+            <img id="qrImage" src="" alt="">
+        </div>
+        <div>
+            <form id="qrForm" onsubmit="return false;">
+                <div class="inputContainer">
+                    <label for="dataInput">Data</label>
+                    <input type="text" onchange="updateQrData();" name="dataInput" id="dataInput"
+                        placeholder="Enter text or url" required />
+                </div>
+                <div class="inputContainer">
+                    <label for="imageInput">Image</label>
+                    <input type="file" onchange="updateQrImg();" name="imageInput" id="imageInput" accept="image/*" />
+                </div>
+                <div class="inputContainer">
+                    <label for="colorInput">Color</label>
+                    <input type="color" onchange="updateQrColor();" name="colorInput" id="colorInput" />
+                </div>
+                <div class="inputContainer">
+                    <label for="colorInputBg">Background Color</label>
+                    <input type="color" onchange="updateQrbackgroundOptions();" name="colorInput" id="colorInputBg" />
+                </div>
+                <div class="inputContainer">
+                    <label for="typeInput">QR - Type</label>
+                    <select name="typeInput" id="typeInput" onchange="updateQrType();">
+                        <option value="square">Square</option>
+                        <option value="rounded">Rounded</option>
+                        <option value="dots">Dots</option>
+                        <option value="classy">Classy</option>
+                        <option value="classy-rounded">Classy-rounded</option>
+                        <option value="extra-rounded">Extra-rounded</option>
+                    </select>
+                </div>
+                <div class="inputContainer">
+                    <label for="typeInputCorner">Corner Type</label>
+                    <select name="typeInput" id="typeInputCorner" onchange="updateQrConerType();">
+                        <option value="square">Square</option>
+                        <option value="dots">Dots</option>
+                        <option value="extra-rounded">Extra-rounded</option>
+                    </select>
+                </div>
+            </form>
+            <button id="formButton" onclick="download();">Download</button>
+        </div>
+    </section>
+    <script type="text/javascript">
+        qrData = document.getElementById('dataInput');
+        qrImage = document.getElementById('imageInput');
+        qrqrColorColor = document.getElementById('colorInput');
+        qrType = document.getElementById('typeInput');
+        qrBg = document.getElementById('colorInputBg');
+        qrCornerType = document.getElementById('typeInputCorner');
+
+        // let qrOptions = {
+        //     content: qrData,
+        //     logo_image: null,
+        //     // dotsOptions_color: qrCornerType,
+        //     dotsOptions_type : 'square',
+        //     backgroundOptions_color: '',
+        //     imageOptions_margin: 20
+        // }
+        let qrOptions = new FormData()
+        
+
+        const download = async (bodyData) => {
+            let res = await fetch("http://localhost:4000/qrcode", {
+                method: "POST",
+                // headers: {
+                //     'Content-Type': 'application/json;charset=utf-8'
+                // },
+                body : bodyData
+            })
+            let responseObj = await res.json()
+            // console.log(data)
+            document.getElementById("qrImage").src = ''
+            document.getElementById("qrImage").src = responseObj.img
+        }
+
+        // function QRCodeStyling() {
+        //      function append() {
+        //         return this
+        //      }
+        // }
+        // const qrCode = new QRCodeStyling({
+        //     width: 300,
+        //     height: 300,
+        //     data: "Puneet",
+        //     image: "",
+        //     dotsOptions: {
+        //         color: "#21ec6e",
+        //         type: "square"
+        //     },
+        //     imageOptions: {
+        //         crossOrigin: "anonymous",
+        //         margin: 10,
+        //         saveAsBlob: true
+        //     }
+        // });
+
+        const updateQrConerType = () => {
+            qrOptions.append('dotsOptions_type', qrCornerType.value)
+            download(qrOptions)
+
+        }
+
+        const updateQrbackgroundOptions = () => {
+            qrOptions.append('backgroundOptions_color', qrqrColorColor.value)
+            download(qrOptions)
+
+        }
+
+        const updateQrData = () => {
+            qrOptions.append('content', qrData.value)
+            download(qrOptions)
+
+        };
+
+        const updateQrColor = () => {
+            qrOptions.append('dotsOptions_color', qrBg.value)
+            download(qrOptions)
+
+        };
+
+        const updateQrImg = () => {
+            qrOptions.append('logo_image', qrImage.files[0])
+            download(qrOptions)
+
+        };
+
+        const updateQrType = () => {
+            qrOptions.append('dotsOptions_type', qrCornerType.value)
+            download(qrOptions)
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            download(qrOptions)
+        });
+        // qrCode.append(document.getElementById('canvas'));
+    </script>
+</body>
+
+</html>
